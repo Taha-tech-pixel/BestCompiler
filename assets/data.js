@@ -734,6 +734,51 @@ const CodeGalaxyData = (() => {
         { title: 'Interface', code: 'interface User { id:number; name:string }\nconst u:User = { id:1, name:"A" };' }
       ],
     },
+
+    {
+      id: 'react',
+      name: 'React',
+      description: 'React is a JavaScript library for building user interfaces, particularly single-page applications. It\'s used for handling the view layer and can be used for developing both web and mobile applications.',
+      categoriesLabel: 'Hooks & Components',
+      functions: [
+        { id: 'useState', name: 'useState', brief: 'State management hook.', detail: 'useState(initialValue) returns a stateful value and a function to update it. The initial value is only used during the first render.' },
+        { id: 'useEffect', name: 'useEffect', brief: 'Side effect hook.', detail: 'useEffect(() => {}, [deps]) runs after every render. Use for data fetching, subscriptions, or manually changing the DOM.' },
+        { id: 'useContext', name: 'useContext', brief: 'Context consumption hook.', detail: 'useContext(Context) subscribes to React context. Returns the current context value for that context.' },
+        { id: 'useReducer', name: 'useReducer', brief: 'Complex state logic hook.', detail: 'useReducer(reducer, initialState) is an alternative to useState for complex state logic involving multiple sub-values.' },
+        { id: 'useCallback', name: 'useCallback', brief: 'Memoized callback hook.', detail: 'useCallback(fn, deps) returns a memoized version of the callback that only changes if one of the dependencies has changed.' },
+        { id: 'useMemo', name: 'useMemo', brief: 'Memoized value hook.', detail: 'useMemo(() => computeExpensiveValue(a, b), [a, b]) returns a memoized value that only recalculates when dependencies change.' },
+        { id: 'useRef', name: 'useRef', brief: 'Mutable reference hook.', detail: 'useRef(initialValue) returns a mutable ref object whose .current property is initialized to the passed argument.' },
+        { id: 'useLayoutEffect', name: 'useLayoutEffect', brief: 'Synchronous effect hook.', detail: 'useLayoutEffect(() => {}, [deps]) fires synchronously after all DOM mutations. Use for measurements and DOM mutations.' },
+      ],
+      uses: [
+        { id: 'ui', name: 'User Interface', brief: 'Build interactive UIs.', detail: 'React excels at creating dynamic, responsive user interfaces with declarative components and efficient rendering.' },
+        { id: 'spa', name: 'Single Page Apps', brief: 'Create SPAs.', detail: 'React is perfect for building single-page applications with smooth navigation and state management.' },
+        { id: 'mobile', name: 'Mobile Development', brief: 'React Native apps.', detail: 'Use React Native to build native mobile applications for iOS and Android using React concepts.' },
+      ],
+      tagGroups: [
+        { id: 'hooks', groupName: 'React Hooks', itemsLabel: 'Hook', items: [
+          { id: 'useState', name: 'useState', brief: 'State management hook.', detail: 'useState(initialValue) returns a stateful value and a function to update it. The initial value is only used during the first render.',
+            example: { code: 'const [count, setCount] = useState(0);\nreturn (\n  <div>\n    <p>Count: {count}</p>\n    <button onClick={() => setCount(count + 1)}>\n      Increment\n    </button>\n  </div>\n);', output: 'Count: 0\n[Increment Button]' }},
+          { id: 'useEffect', name: 'useEffect', brief: 'Side effect hook.', detail: 'useEffect(() => {}, [deps]) runs after every render. Use for data fetching, subscriptions, or manually changing the DOM.',
+            example: { code: 'useEffect(() => {\n  document.title = `Count: ${count}`;\n}, [count]);', output: 'Updates document title when count changes' }},
+          { id: 'useContext', name: 'useContext', brief: 'Context consumption hook.', detail: 'useContext(Context) subscribes to React context. Returns the current context value for that context.',
+            example: { code: 'const theme = useContext(ThemeContext);\nreturn <div className={theme}>Content</div>;', output: 'Content with theme styling applied' }},
+        ]},
+        { id: 'components', groupName: 'Components', itemsLabel: 'Component', items: [
+          { id: 'functional', name: 'Functional Component', brief: 'Function-based component.', detail: 'A JavaScript function that accepts props and returns React elements.',
+            example: { code: 'function Welcome(props) {\n  return <h1>Hello, {props.name}!</h1>;\n}', output: 'Hello, [name]!' }},
+          { id: 'class', name: 'Class Component', brief: 'Class-based component.', detail: 'A JavaScript class that extends React.Component and has a render method.',
+            example: { code: 'class Welcome extends React.Component {\n  render() {\n    return <h1>Hello, {this.props.name}!</h1>;\n  }\n}', output: 'Hello, [name]!' }},
+          { id: 'jsx', name: 'JSX', brief: 'JavaScript XML syntax.', detail: 'JSX allows you to write HTML-like code in JavaScript.',
+            example: { code: 'const element = <h1>Hello, world!</h1>;', output: 'Hello, world!' }},
+        ]},
+      ],
+      examples: [
+        { title: 'Counter Component', code: 'function Counter() {\n  const [count, setCount] = useState(0);\n  \n  return (\n    <div>\n      <p>Count: {count}</p>\n      <button onClick={() => setCount(count + 1)}>\n        Increment\n      </button>\n    </div>\n  );\n}' },
+        { title: 'Data Fetching', code: 'function UserProfile({ userId }) {\n  const [user, setUser] = useState(null);\n  \n  useEffect(() => {\n    fetch(`/api/users/${userId}`)\n      .then(res => res.json())\n      .then(data => setUser(data));\n  }, [userId]);\n  \n  if (!user) return <div>Loading...</div>;\n  return <h1>{user.name}</h1>;\n}' },
+        { title: 'Custom Hook', code: 'function useLocalStorage(key, initialValue) {\n  const [storedValue, setStoredValue] = useState(() => {\n    try {\n      const item = window.localStorage.getItem(key);\n      return item ? JSON.parse(item) : initialValue;\n    } catch (error) {\n      return initialValue;\n    }\n  });\n  \n  const setValue = value => {\n    setStoredValue(value);\n    window.localStorage.setItem(key, JSON.stringify(value));\n  };\n  \n  return [storedValue, setValue];\n}' },
+      ],
+    },
   ];
 
   const numberSystems = [
