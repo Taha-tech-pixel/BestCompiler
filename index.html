@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CodeGalaxy — Learn Languages, Tags, Uses, Functions, Numbers</title>
+    <meta name="description" content="A beautifully organized hub for programming languages, functions, uses, tags, examples, number systems, converters, and coding schemes.">
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <div class="brand" onclick="location.hash='/'">CodeGalaxy</div>
+            <nav class="nav">
+                <a href="#/">Home</a>
+                <a href="#/languages">Languages</a>
+                <a href="#/compiler">Compiler</a>
+                <a href="#/number-systems">Number Systems</a>
+                <a href="#/converter">Number Converter</a>
+                <a href="#/coding-schemes">Coding Schemes</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="app" class="container page"></main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>© <span id="year"></span> CodeGalaxy. All rights reserved.</div>
+            <div class="footer-note">Designed for clarity, depth, and discovery.</div>
+        </div>
+    </footer>
+
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+    <script src="assets/data.js"></script>
+    <script src="assets/app.js"></script>
+</body>
+<!--
+  This project is a single-page application using hash-based routing.
+  Routes include:
+  - #/ (home)
+  - #/languages → list of languages
+  - #/language/:id → language overview (Functions, Uses, Tags, Examples)
+  - #/language/:id/functions → list → /:functionId → detail
+  - #/language/:id/uses → list → /:useId → detail
+  - #/language/:id/tags → groups → /:groupId → items → /:itemId → detail
+  - #/language/:id/examples → example snippets
+  - #/compiler → simple in-browser playground (JS and HTML/CSS supported)
+  - #/number-systems → cards → /:id → detail
+  - #/converter → any-base converter (2, 8, 10, 16)
+  - #/coding-schemes → ASCII / Unicode → /:id → detail
+-->
+</html>
+
+
