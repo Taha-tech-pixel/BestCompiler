@@ -241,6 +241,23 @@
     if (!group) return notFound();
     const item = group.items.find(i => i.id === itemId);
     if (!item) return notFound();
+    
+    const exampleSection = item.example ? `
+      <div class="section-title">Example</div>
+      <div class="split">
+        <div class="stack">
+          <div class="section-title">Code</div>
+          <pre><code>${escapeHTML(item.example.code)}</code></pre>
+        </div>
+        <div class="stack">
+          <div class="section-title">Output</div>
+          <div class="panel">
+            <pre style="white-space: pre-wrap; margin: 0;">${escapeHTML(item.example.output)}</pre>
+          </div>
+        </div>
+      </div>
+    ` : '';
+    
     app.innerHTML = `
       <div class="panel">
         <h2>${escapeHTML(lang.name)} — ${escapeHTML(item.name)}</h2>
@@ -249,6 +266,7 @@
           <a class="btn secondary" href="#/language/${lang.id}/tags/${encodeURIComponent(group.id)}">Back to ${escapeHTML(group.groupName)}</a>
         </div>
       </div>
+      ${exampleSection}
     `;
   };
 
@@ -710,6 +728,445 @@
     `;
   };
 
+  // Progress tracking page
+  const renderProgress = () => {
+    const userProgress = JSON.parse(localStorage.getItem('userProgress')) || {};
+    const completedItems = Object.keys(userProgress).length;
+    const totalItems = CodeGalaxyData.languages.length * 4; // 4 sections per language
+    const progressPercent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+    
+    const recentActivity = JSON.parse(localStorage.getItem('recentActivity')) || [];
+    
+    app.innerHTML = `
+      <div class="panel">
+        <h2>Your Learning Progress</h2>
+        <p class="muted">Track your journey through CodeGalaxy's programming content.</p>
+      </div>
+      
+      <div class="split">
+        <div class="stack">
+          <div class="section-title">Overall Progress</div>
+          <div class="panel">
+            <div class="progress-info">
+              <span>${completedItems} of ${totalItems} sections completed</span>
+              <span>${progressPercent}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progressPercent}%"></div>
+            </div>
+          </div>
+          
+          <div class="section-title">Language Progress</div>
+          <div class="grid">
+            ${CodeGalaxyData.languages.map(lang => {
+              const langProgress = userProgress[lang.id] || {};
+              const sections = ['functions', 'uses', 'tags', 'examples'];
+              const completedSections = sections.filter(section => langProgress[section]).length;
+              const langPercent = Math.round((completedSections / sections.length) * 100);
+              
+              return card({
+                title: lang.name,
+                subtitle: `${completedSections}/${sections.length} sections completed`,
+                chips: [`${langPercent}%`],
+                href: `#/language/${lang.id}`
+              });
+            }).join('')}
+          </div>
+        </div>
+        
+        <div class="stack">
+          <div class="section-title">Recent Activity</div>
+          <div class="panel">
+            ${recentActivity.length > 0 ? `
+              <div class="activity-list">
+                ${recentActivity.slice(0, 10).map(activity => `
+                  <div class="activity-item">
+                    <div class="activity-icon">📚</div>
+                    <div class="activity-text">${escapeHTML(activity.action)}</div>
+                    <div class="activity-time">${activity.time}</div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : `
+              <p class="muted">No recent activity. Start exploring to see your progress here!</p>
+            `}
+          </div>
+          
+          <div class="section-title">Quick Actions</div>
+          <div class="panel">
+            <div class="stack">
+              <button class="btn" onclick="localStorage.removeItem('userProgress'); location.reload();">
+                Reset Progress
+              </button>
+              <button class="btn secondary" onclick="location.hash='#/languages'">
+                Continue Learning
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  // Challenges page
+  const renderChallenges = () => {
+    const challenges = [
+      {
+        id: 'js-basics',
+        title: 'JavaScript Basics',
+        difficulty: 'Beginner',
+        description: 'Master fundamental JavaScript concepts',
+        tasks: [
+          'Create a function that reverses a string',
+          'Write a function to check if a number is prime',
+          'Implement array methods: map, filter, reduce'
+        ],
+        language: 'JavaScript',
+        points: 100
+      },
+      {
+        id: 'python-data',
+        title: 'Python Data Structures',
+        difficulty: 'Intermediate',
+        description: 'Work with Python lists, dictionaries, and sets',
+        tasks: [
+          'Create a dictionary from two lists',
+          'Find the most common element in a list',
+          'Remove duplicates while preserving order'
+        ],
+        language: 'Python',
+        points: 150
+      },
+      {
+        id: 'html-css',
+        title: 'HTML & CSS Layout',
+        difficulty: 'Beginner',
+        description: 'Build responsive layouts with HTML and CSS',
+        tasks: [
+          'Create a responsive navigation bar',
+          'Build a card layout with CSS Grid',
+          'Style a contact form with validation'
+        ],
+        language: 'HTML/CSS',
+        points: 120
+      },
+      {
+        id: 'number-conversion',
+        title: 'Number System Conversion',
+        difficulty: 'Intermediate',
+        description: 'Practice converting between number systems',
+        tasks: [
+          'Convert decimal 255 to binary and hexadecimal',
+          'Add two binary numbers manually',
+          'Convert octal 777 to decimal'
+        ],
+        language: 'Mathematics',
+        points: 80
+      },
+      {
+        id: 'sql-queries',
+        title: 'SQL Database Queries',
+        difficulty: 'Intermediate',
+        description: 'Write complex SQL queries and joins',
+        tasks: [
+          'Write a query to find duplicate records',
+          'Create a self-join to find employee hierarchy',
+          'Use window functions for ranking'
+        ],
+        language: 'SQL',
+        points: 200
+      },
+      {
+        id: 'algorithm-challenge',
+        title: 'Algorithm Challenge',
+        difficulty: 'Advanced',
+        description: 'Solve algorithmic problems efficiently',
+        tasks: [
+          'Implement binary search algorithm',
+          'Write a sorting algorithm from scratch',
+          'Solve the two-sum problem optimally'
+        ],
+        language: 'Any Language',
+        points: 300
+      }
+    ];
+
+    const completedChallenges = JSON.parse(localStorage.getItem('completedChallenges')) || [];
+    const totalPoints = completedChallenges.reduce((sum, id) => {
+      const challenge = challenges.find(c => c.id === id);
+      return sum + (challenge ? challenge.points : 0);
+    }, 0);
+
+    app.innerHTML = `
+      <div class="panel">
+        <h2>Coding Challenges</h2>
+        <p class="muted">Test your skills with practical programming challenges. Complete challenges to earn points and track your progress.</p>
+        <div style="margin-top: 12px;">
+          <span class="badge success">Total Points: ${totalPoints}</span>
+          <span class="badge primary">Completed: ${completedChallenges.length}</span>
+        </div>
+      </div>
+      
+      <div class="grid">
+        ${challenges.map(challenge => {
+          const isCompleted = completedChallenges.includes(challenge.id);
+          const difficultyColor = challenge.difficulty === 'Beginner' ? 'success' : 
+                                 challenge.difficulty === 'Intermediate' ? 'warning' : 'danger';
+          
+          return card({
+            title: challenge.title,
+            subtitle: challenge.description,
+            chips: [
+              challenge.language,
+              `${challenge.points} pts`,
+              challenge.difficulty
+            ],
+            href: `#/challenges/${challenge.id}`,
+            pre: isCompleted ? '✅ Completed' : ''
+          });
+        }).join('')}
+      </div>
+    `;
+  };
+
+  const renderChallengeDetail = (challengeId) => {
+    const challenges = [
+      {
+        id: 'js-basics',
+        title: 'JavaScript Basics',
+        difficulty: 'Beginner',
+        description: 'Master fundamental JavaScript concepts',
+        tasks: [
+          'Create a function that reverses a string',
+          'Write a function to check if a number is prime',
+          'Implement array methods: map, filter, reduce'
+        ],
+        language: 'JavaScript',
+        points: 100,
+        hints: [
+          'Use string methods like split(), reverse(), and join()',
+          'Check divisibility from 2 to square root of the number',
+          'Study the callback function pattern'
+        ],
+        solutions: [
+          'function reverseString(str) { return str.split("").reverse().join(""); }',
+          'function isPrime(num) { for(let i=2; i<=Math.sqrt(num); i++) if(num%i===0) return false; return num>1; }',
+          'const doubled = numbers.map(x => x * 2); const evens = numbers.filter(x => x % 2 === 0); const sum = numbers.reduce((a, b) => a + b, 0);'
+        ]
+      },
+      {
+        id: 'python-data',
+        title: 'Python Data Structures',
+        difficulty: 'Intermediate',
+        description: 'Work with Python lists, dictionaries, and sets',
+        tasks: [
+          'Create a dictionary from two lists',
+          'Find the most common element in a list',
+          'Remove duplicates while preserving order'
+        ],
+        language: 'Python',
+        points: 150,
+        hints: [
+          'Use the zip() function to combine lists',
+          'Use collections.Counter or a dictionary to count occurrences',
+          'Use a list comprehension with a condition'
+        ],
+        solutions: [
+          'dict(zip(keys, values))',
+          'from collections import Counter; Counter(items).most_common(1)[0][0]',
+          '[x for i, x in enumerate(items) if x not in items[:i]]'
+        ]
+      },
+      {
+        id: 'html-css',
+        title: 'HTML & CSS Layout',
+        difficulty: 'Beginner',
+        description: 'Build responsive layouts with HTML and CSS',
+        tasks: [
+          'Create a responsive navigation bar',
+          'Build a card layout with CSS Grid',
+          'Style a contact form with validation'
+        ],
+        language: 'HTML/CSS',
+        points: 120,
+        hints: [
+          'Use flexbox for horizontal layout and media queries for mobile',
+          'Use grid-template-columns with repeat() and auto-fit',
+          'Use :valid and :invalid pseudo-classes'
+        ],
+        solutions: [
+          '<nav style="display: flex; justify-content: space-between; align-items: center;">...</nav>',
+          '.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }',
+          'input:valid { border-color: green; } input:invalid { border-color: red; }'
+        ]
+      },
+      {
+        id: 'number-conversion',
+        title: 'Number System Conversion',
+        difficulty: 'Intermediate',
+        description: 'Practice converting between number systems',
+        tasks: [
+          'Convert decimal 255 to binary and hexadecimal',
+          'Add two binary numbers manually',
+          'Convert octal 777 to decimal'
+        ],
+        language: 'Mathematics',
+        points: 80,
+        hints: [
+          'Divide by 2 repeatedly for binary, by 16 for hex',
+          'Add from right to left, carrying when needed',
+          'Multiply each digit by 8^position and sum'
+        ],
+        solutions: [
+          '255 = 11111111 (binary) = FF (hex)',
+          '1010 + 1101 = 10111',
+          '777 (octal) = 7×8² + 7×8¹ + 7×8⁰ = 511 (decimal)'
+        ]
+      },
+      {
+        id: 'sql-queries',
+        title: 'SQL Database Queries',
+        difficulty: 'Intermediate',
+        description: 'Write complex SQL queries and joins',
+        tasks: [
+          'Write a query to find duplicate records',
+          'Create a self-join to find employee hierarchy',
+          'Use window functions for ranking'
+        ],
+        language: 'SQL',
+        points: 200,
+        hints: [
+          'Use GROUP BY and HAVING COUNT(*) > 1',
+          'Join a table to itself with different aliases',
+          'Use ROW_NUMBER() or RANK() OVER (ORDER BY column)'
+        ],
+        solutions: [
+          'SELECT column, COUNT(*) FROM table GROUP BY column HAVING COUNT(*) > 1',
+          'SELECT e1.name, e2.name as manager FROM employees e1 LEFT JOIN employees e2 ON e1.manager_id = e2.id',
+          'SELECT *, ROW_NUMBER() OVER (ORDER BY score DESC) as rank FROM students'
+        ]
+      },
+      {
+        id: 'algorithm-challenge',
+        title: 'Algorithm Challenge',
+        difficulty: 'Advanced',
+        description: 'Solve algorithmic problems efficiently',
+        tasks: [
+          'Implement binary search algorithm',
+          'Write a sorting algorithm from scratch',
+          'Solve the two-sum problem optimally'
+        ],
+        language: 'Any Language',
+        points: 300,
+        hints: [
+          'Keep track of left and right boundaries',
+          'Consider quicksort or mergesort',
+          'Use a hash map for O(n) time complexity'
+        ],
+        solutions: [
+          'function binarySearch(arr, target) { let left = 0, right = arr.length - 1; while (left <= right) { let mid = Math.floor((left + right) / 2); if (arr[mid] === target) return mid; if (arr[mid] < target) left = mid + 1; else right = mid - 1; } return -1; }',
+          'function quickSort(arr) { if (arr.length <= 1) return arr; const pivot = arr[0]; const left = arr.slice(1).filter(x => x <= pivot); const right = arr.slice(1).filter(x => x > pivot); return [...quickSort(left), pivot, ...quickSort(right)]; }',
+          'function twoSum(nums, target) { const map = new Map(); for (let i = 0; i < nums.length; i++) { const complement = target - nums[i]; if (map.has(complement)) return [map.get(complement), i]; map.set(nums[i], i); } return []; }'
+        ]
+      }
+    ];
+
+    const challenge = challenges.find(c => c.id === challengeId);
+    if (!challenge) return notFound();
+
+    const completedChallenges = JSON.parse(localStorage.getItem('completedChallenges')) || [];
+    const isCompleted = completedChallenges.includes(challengeId);
+
+    app.innerHTML = `
+      <div class="panel">
+        <h2>${escapeHTML(challenge.title)}</h2>
+        <p>${escapeHTML(challenge.description)}</p>
+        <div style="margin-top: 12px;">
+          <span class="badge ${challenge.difficulty === 'Beginner' ? 'success' : challenge.difficulty === 'Intermediate' ? 'warning' : 'danger'}">${challenge.difficulty}</span>
+          <span class="badge primary">${challenge.language}</span>
+          <span class="badge info">${challenge.points} points</span>
+          ${isCompleted ? '<span class="badge success">✅ Completed</span>' : ''}
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="stack">
+          <div class="section-title">Tasks</div>
+          <div class="panel">
+            <ol style="margin: 0; padding-left: 20px;">
+              ${challenge.tasks.map(task => `<li style="margin-bottom: 8px;">${escapeHTML(task)}</li>`).join('')}
+            </ol>
+          </div>
+          
+          <div class="section-title">Hints</div>
+          <div class="panel">
+            <ol style="margin: 0; padding-left: 20px;">
+              ${challenge.hints.map(hint => `<li style="margin-bottom: 8px;">${escapeHTML(hint)}</li>`).join('')}
+            </ol>
+          </div>
+        </div>
+        
+        <div class="stack">
+          <div class="section-title">Solutions</div>
+          <div class="panel">
+            <div class="stack">
+              ${challenge.solutions.map((solution, index) => `
+                <div>
+                  <strong>Task ${index + 1}:</strong>
+                  <pre><code>${escapeHTML(solution)}</code></pre>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div class="section-title">Actions</div>
+          <div class="panel">
+            <div class="stack">
+              ${!isCompleted ? `
+                <button class="btn" onclick="markChallengeComplete('${challengeId}')">
+                  Mark as Complete
+                </button>
+              ` : `
+                <button class="btn secondary" onclick="markChallengeIncomplete('${challengeId}')">
+                  Mark as Incomplete
+                </button>
+              `}
+              <button class="btn secondary" onclick="location.hash='#/challenges'">
+                Back to Challenges
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  // Helper functions for challenges
+  window.markChallengeComplete = (challengeId) => {
+    const completedChallenges = JSON.parse(localStorage.getItem('completedChallenges')) || [];
+    if (!completedChallenges.includes(challengeId)) {
+      completedChallenges.push(challengeId);
+      localStorage.setItem('completedChallenges', JSON.stringify(completedChallenges));
+      
+      // Add to recent activity
+      const recentActivity = JSON.parse(localStorage.getItem('recentActivity')) || [];
+      recentActivity.unshift({
+        action: `Completed challenge: ${challengeId}`,
+        time: new Date().toLocaleDateString()
+      });
+      localStorage.setItem('recentActivity', JSON.stringify(recentActivity.slice(0, 20)));
+      
+      location.reload();
+    }
+  };
+
+  window.markChallengeIncomplete = (challengeId) => {
+    const completedChallenges = JSON.parse(localStorage.getItem('completedChallenges')) || [];
+    const filtered = completedChallenges.filter(id => id !== challengeId);
+    localStorage.setItem('completedChallenges', JSON.stringify(filtered));
+    location.reload();
+  };
+
   // Router
   const routes = [
     { pattern: /^#\/?$/, handler: () => renderHome() },
@@ -729,6 +1186,9 @@
     { pattern: /^#\/converter\/?$/, handler: () => renderConverter() },
     { pattern: /^#\/coding-schemes\/?$/, handler: () => renderCodingSchemes() },
     { pattern: /^#\/coding-schemes\/([a-z0-9\-]+)\/?$/, handler: (m) => renderCodingSchemeDetail(m[1]) },
+    { pattern: /^#\/progress\/?$/, handler: () => renderProgress() },
+    { pattern: /^#\/challenges\/?$/, handler: () => renderChallenges() },
+    { pattern: /^#\/challenges\/([a-z0-9\-]+)\/?$/, handler: (m) => renderChallengeDetail(m[1]) },
   ];
 
   const route = () => {
