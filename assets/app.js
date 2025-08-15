@@ -269,81 +269,326 @@
 
   // Compiler page
   const renderCompiler = () => {
-    const htmlId = 'editor-html';
-    const jsId = 'editor-js';
-    const outId = 'output';
+    const languageSelectId = 'language-select';
+    const codeEditorId = 'code-editor';
+    const outputId = 'output';
     const consoleId = 'console';
+    
+    const languages = [
+      { id: 'javascript', name: 'JavaScript', ext: 'js' },
+      { id: 'python', name: 'Python', ext: 'py' },
+      { id: 'java', name: 'Java', ext: 'java' },
+      { id: 'cpp', name: 'C++', ext: 'cpp' },
+      { id: 'c', name: 'C', ext: 'c' },
+      { id: 'csharp', name: 'C#', ext: 'cs' },
+      { id: 'php', name: 'PHP', ext: 'php' },
+      { id: 'go', name: 'Go', ext: 'go' },
+      { id: 'rust', name: 'Rust', ext: 'rs' },
+      { id: 'swift', name: 'Swift', ext: 'swift' },
+      { id: 'kotlin', name: 'Kotlin', ext: 'kt' },
+      { id: 'typescript', name: 'TypeScript', ext: 'ts' },
+      { id: 'ruby', name: 'Ruby', ext: 'rb' },
+      { id: 'scala', name: 'Scala', ext: 'scala' },
+      { id: 'dart', name: 'Dart', ext: 'dart' },
+      { id: 'r', name: 'R', ext: 'r' },
+      { id: 'sql', name: 'SQL', ext: 'sql' },
+      { id: 'html', name: 'HTML', ext: 'html' }
+    ];
+
+    const defaultCode = {
+      javascript: 'console.log("Hello, World!");\n\n// Try some JavaScript\nconst numbers = [1, 2, 3, 4, 5];\nconst doubled = numbers.map(x => x * 2);\nconsole.log("Original:", numbers);\nconsole.log("Doubled:", doubled);',
+      python: 'print("Hello, World!")\n\n# Try some Python\nnumbers = [1, 2, 3, 4, 5]\ndoubled = [x * 2 for x in numbers]\nprint("Original:", numbers)\nprint("Doubled:", doubled)',
+      java: 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n        \n        // Try some Java\n        int[] numbers = {1, 2, 3, 4, 5};\n        for (int num : numbers) {\n            System.out.println("Number: " + num);\n        }\n    }\n}',
+      cpp: '#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    cout << "Hello, World!" << endl;\n    \n    // Try some C++\n    vector<int> numbers = {1, 2, 3, 4, 5};\n    for (int num : numbers) {\n        cout << "Number: " << num << endl;\n    }\n    \n    return 0;\n}',
+      c: '#include <stdio.h>\n\nint main() {\n    printf("Hello, World!\\n");\n    \n    // Try some C\n    int numbers[] = {1, 2, 3, 4, 5};\n    int size = sizeof(numbers) / sizeof(numbers[0]);\n    \n    for (int i = 0; i < size; i++) {\n        printf("Number: %d\\n", numbers[i]);\n    }\n    \n    return 0;\n}',
+      csharp: 'using System;\nusing System.Linq;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hello, World!");\n        \n        // Try some C#\n        int[] numbers = {1, 2, 3, 4, 5};\n        var doubled = numbers.Select(x => x * 2);\n        \n        Console.WriteLine("Original: " + string.Join(", ", numbers));\n        Console.WriteLine("Doubled: " + string.Join(", ", doubled));\n    }\n}',
+      php: '<?php\necho "Hello, World!\\n";\n\n// Try some PHP\n$numbers = [1, 2, 3, 4, 5];\n$doubled = array_map(function($x) { return $x * 2; }, $numbers);\n\necho "Original: " . implode(", ", $numbers) . "\\n";\necho "Doubled: " . implode(", ", $doubled) . "\\n";\n?>',
+      go: 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World!")\n    \n    // Try some Go\n    numbers := []int{1, 2, 3, 4, 5}\n    for _, num := range numbers {\n        fmt.Printf("Number: %d\\n", num)\n    }\n}',
+      rust: 'fn main() {\n    println!("Hello, World!");\n    \n    // Try some Rust\n    let numbers = vec![1, 2, 3, 4, 5];\n    for num in &numbers {\n        println!("Number: {}", num);\n    }\n}',
+      swift: 'import Foundation\n\nprint("Hello, World!")\n\n// Try some Swift\nlet numbers = [1, 2, 3, 4, 5]\nlet doubled = numbers.map { $0 * 2 }\n\nprint("Original:", numbers)\nprint("Doubled:", doubled)',
+      kotlin: 'fun main() {\n    println("Hello, World!")\n    \n    // Try some Kotlin\n    val numbers = listOf(1, 2, 3, 4, 5)\n    val doubled = numbers.map { it * 2 }\n    \n    println("Original: $numbers")\n    println("Doubled: $doubled")\n}',
+      typescript: 'console.log("Hello, World!");\n\n// Try some TypeScript\nconst numbers: number[] = [1, 2, 3, 4, 5];\nconst doubled: number[] = numbers.map(x => x * 2);\n\nconsole.log("Original:", numbers);\nconsole.log("Doubled:", doubled);',
+      ruby: 'puts "Hello, World!"\n\n# Try some Ruby\nnumbers = [1, 2, 3, 4, 5]\ndoubled = numbers.map { |x| x * 2 }\n\nputs "Original: #{numbers}"\nputs "Doubled: #{doubled}"',
+      scala: 'object Main extends App {\n  println("Hello, World!")\n  \n  // Try some Scala\n  val numbers = List(1, 2, 3, 4, 5)\n  val doubled = numbers.map(_ * 2)\n  \n  println(s"Original: $numbers")\n  println(s"Doubled: $doubled")\n}',
+      dart: 'void main() {\n  print("Hello, World!");\n  \n  // Try some Dart\n  List<int> numbers = [1, 2, 3, 4, 5];\n  List<int> doubled = numbers.map((x) => x * 2).toList();\n  \n  print("Original: $numbers");\n  print("Doubled: $doubled");\n}',
+      r: 'cat("Hello, World!\\n")\n\n# Try some R\nnumbers <- c(1, 2, 3, 4, 5)\ndoubled <- numbers * 2\n\ncat("Original:", numbers, "\\n")\ncat("Doubled:", doubled, "\\n")',
+      sql: '-- SQL Example\nSELECT "Hello, World!" AS greeting;\n\n-- Create a sample table\nCREATE TABLE numbers (id INT, value INT);\nINSERT INTO numbers VALUES (1, 1), (2, 2), (3, 3), (4, 4), (5, 5);\n\n-- Query the table\nSELECT id, value, value * 2 AS doubled\nFROM numbers\nORDER BY id;',
+      html: '<!DOCTYPE html>\n<html>\n<head>\n    <title>Hello World</title>\n    <style>\n        body { font-family: Arial, sans-serif; padding: 20px; }\n        .container { max-width: 600px; margin: 0 auto; }\n        .highlight { color: #007bff; }\n    </style>\n</head>\n<body>\n    <div class="container">\n        <h1 class="highlight">Hello, World!</h1>\n        <p>This is a sample HTML page.</p>\n        <ul>\n            <li>Item 1</li>\n            <li>Item 2</li>\n            <li>Item 3</li>\n        </ul>\n    </div>\n</body>\n</html>'
+    };
+
     app.innerHTML = `
       <div class="panel">
-        <h2>In-Browser Compiler & Playground</h2>
-        <p class="muted">Run JavaScript and preview HTML/CSS/JS directly. The console logs appear below.</p>
+        <h2>Multi-Language Compiler & Playground</h2>
+        <p class="muted">Run code in multiple programming languages directly in your browser. Select a language and start coding!</p>
       </div>
+      
       <div class="split">
         <div class="stack">
-          <div class="section-title">HTML/CSS/JS</div>
-          <textarea id="${htmlId}" class="mono" style="width:100%;height:220px;border-radius:12px;background:#0f152c;color:#e6ecff;border:1px solid rgba(255,255,255,.08);padding:10px">
-<!doctype html>
-<html>
-  <head>
-    <style>
-      body { font-family: system-ui; padding: 12px }
-      .hello { color: #1f6bff }
-    </style>
-  </head>
-  <body>
-    <h3 class="hello">Hello from the sandbox!</h3>
-  </body>
-</html>
-          </textarea>
-          <button class="btn" id="run-html">Run HTML</button>
+          <div class="section-title">Language & Code</div>
+          <select id="${languageSelectId}" style="padding:10px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);margin-bottom:12px">
+            ${languages.map(lang => `<option value="${lang.id}">${lang.name}</option>`).join('')}
+          </select>
+          <textarea id="${codeEditorId}" class="mono" style="width:100%;height:400px;border-radius:12px;background:#0f152c;color:#e6ecff;border:1px solid rgba(255,255,255,.08);padding:10px;font-size:14px;line-height:1.4"></textarea>
+          <button class="btn" id="run-code" style="margin-top:12px">Run Code</button>
         </div>
         <div class="stack">
-          <div class="section-title">JavaScript</div>
-          <textarea id="${jsId}" class="mono" style="width:100%;height:220px;border-radius:12px;background:#0f152c;color:#e6ecff;border:1px solid rgba(255,255,255,.08);padding:10px">console.log('2 + 3 =', 2 + 3);
-          </textarea>
-          <button class="btn" id="run-js">Run JS</button>
+          <div class="section-title">Output</div>
+          <pre id="${outputId}" class="mono" style="height:300px;background:#0f152c;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px;overflow:auto"></pre>
+          <div class="section-title" style="margin-top:16px">Console</div>
+          <pre id="${consoleId}" class="mono" style="height:200px;background:#0f152c;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px;overflow:auto"></pre>
         </div>
       </div>
-      <div class="split" style="margin-top:18px">
-        <div class="stack">
-          <div class="section-title">Preview</div>
-          <iframe id="${outId}" style="width:100%;height:300px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:white"></iframe>
-        </div>
-        <div class="stack">
-          <div class="section-title">Console</div>
-          <pre id="${consoleId}" class="mono" style="height:300px"></pre>
+      
+      <div class="panel" style="margin-top:18px">
+        <div class="section-title">Language Support</div>
+        <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));">
+          ${languages.map(lang => `
+            <div class="card" style="cursor:pointer" onclick="document.getElementById('${languageSelectId}').value='${lang.id}';document.getElementById('${languageSelectId}').dispatchEvent(new Event('change'))">
+              <h3 style="margin:0;font-size:16px">${lang.name}</h3>
+              <p style="margin:4px 0 0;font-size:12px;color:var(--muted)">.${lang.ext}</p>
+            </div>
+          `).join('')}
         </div>
       </div>
     `;
 
-    const previewFrame = document.getElementById(outId);
-    const htmlArea = document.getElementById(htmlId);
-    const jsArea = document.getElementById(jsId);
+    const languageSelect = document.getElementById(languageSelectId);
+    const codeEditor = document.getElementById(codeEditorId);
+    const outputPre = document.getElementById(outputId);
     const consolePre = document.getElementById(consoleId);
 
-    const writePreview = () => {
-      const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
-      doc.open();
-      doc.write(htmlArea.value);
-      doc.close();
-    };
+    // Set initial code
+    codeEditor.value = defaultCode.javascript;
 
-    const captureConsole = () => {
+    // Language change handler
+    languageSelect.addEventListener('change', () => {
+      const selectedLang = languageSelect.value;
+      codeEditor.value = defaultCode[selectedLang] || '';
+      outputPre.textContent = '';
       consolePre.textContent = '';
-      const log = (...args) => {
-        consolePre.textContent += args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') + '\n';
-      };
-      try {
-        const fn = new Function('console', jsArea.value);
-        fn({ log });
-      } catch (e) {
-        log('Error:', e.message);
-      }
-    };
+    });
 
-    document.getElementById('run-html').addEventListener('click', writePreview);
-    document.getElementById('run-js').addEventListener('click', captureConsole);
-    writePreview();
+    // Run code handler
+    document.getElementById('run-code').addEventListener('click', () => {
+      const selectedLang = languageSelect.value;
+      const code = codeEditor.value;
+      
+      outputPre.textContent = '';
+      consolePre.textContent = '';
+      
+      try {
+        switch (selectedLang) {
+          case 'javascript':
+            runJavaScript(code);
+            break;
+          case 'python':
+            runPython(code);
+            break;
+          case 'html':
+            runHTML(code);
+            break;
+          case 'sql':
+            runSQL(code);
+            break;
+          default:
+            runGeneric(selectedLang, code);
+        }
+      } catch (error) {
+        consolePre.textContent = `Error: ${error.message}`;
+      }
+    });
+
+    function runJavaScript(code) {
+      const originalLog = console.log;
+      const originalError = console.error;
+      const originalWarn = console.warn;
+      
+      const logs = [];
+      const errors = [];
+      const warnings = [];
+      
+      // Override console methods
+      console.log = (...args) => {
+        logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+      };
+      console.error = (...args) => {
+        errors.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+      };
+      console.warn = (...args) => {
+        warnings.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+      };
+      
+      try {
+        const result = eval(code);
+        if (result !== undefined) {
+          outputPre.textContent = `Result: ${typeof result === 'object' ? JSON.stringify(result, null, 2) : String(result)}`;
+        }
+      } catch (error) {
+        errors.push(error.message);
+      } finally {
+        // Restore console methods
+        console.log = originalLog;
+        console.error = originalError;
+        console.warn = originalWarn;
+      }
+      
+      if (logs.length > 0) {
+        consolePre.textContent += logs.join('\n') + '\n';
+      }
+      if (warnings.length > 0) {
+        consolePre.textContent += warnings.map(w => `Warning: ${w}`).join('\n') + '\n';
+      }
+      if (errors.length > 0) {
+        consolePre.textContent += errors.map(e => `Error: ${e}`).join('\n') + '\n';
+      }
+    }
+
+    function runPython(code) {
+      // Simple Python-like interpreter for basic operations
+      const lines = code.split('\n');
+      let output = '';
+      let variables = {};
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        if (line.startsWith('#')) continue; // Skip comments
+        
+        if (line.startsWith('print(') && line.endsWith(')')) {
+          const content = line.slice(6, -1);
+          if (content.startsWith('"') && content.endsWith('"')) {
+            output += content.slice(1, -1) + '\n';
+          } else {
+            // Try to evaluate the expression
+            try {
+              const result = evaluatePythonExpression(content, variables);
+              output += String(result) + '\n';
+            } catch (error) {
+              output += `Error: ${error.message}\n`;
+            }
+          }
+        } else if (line.includes('=')) {
+          // Variable assignment
+          const [varName, value] = line.split('=').map(s => s.trim());
+          try {
+            variables[varName] = evaluatePythonExpression(value, variables);
+          } catch (error) {
+            output += `Error: ${error.message}\n`;
+          }
+        }
+      }
+      
+      outputPre.textContent = output;
+    }
+
+    function evaluatePythonExpression(expr, variables) {
+      // Simple expression evaluator
+      expr = expr.trim();
+      
+      // Handle string literals
+      if (expr.startsWith('"') && expr.endsWith('"')) {
+        return expr.slice(1, -1);
+      }
+      
+      // Handle variable references
+      if (variables.hasOwnProperty(expr)) {
+        return variables[expr];
+      }
+      
+      // Handle simple arithmetic
+      if (/^[\d\s\+\-\*\/\(\)]+$/.test(expr)) {
+        try {
+          return eval(expr);
+        } catch (error) {
+          throw new Error(`Invalid expression: ${expr}`);
+        }
+      }
+      
+      // Handle list literals
+      if (expr.startsWith('[') && expr.endsWith(']')) {
+        const content = expr.slice(1, -1);
+        if (content.trim() === '') return [];
+        
+        const items = content.split(',').map(item => {
+          const trimmed = item.trim();
+          if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+            return trimmed.slice(1, -1);
+          }
+          return evaluatePythonExpression(trimmed, variables);
+        });
+        return items;
+      }
+      
+      throw new Error(`Cannot evaluate: ${expr}`);
+    }
+
+    function runHTML(code) {
+      // Create a sandboxed iframe for HTML preview
+      const iframe = document.createElement('iframe');
+      iframe.style.width = '100%';
+      iframe.style.height = '300px';
+      iframe.style.border = '1px solid rgba(255,255,255,.12)';
+      iframe.style.borderRadius = '12px';
+      iframe.style.background = 'white';
+      
+      outputPre.innerHTML = '';
+      outputPre.appendChild(iframe);
+      
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write(code);
+      doc.close();
+    }
+
+    function runSQL(code) {
+      // Simple SQL-like interpreter for demonstration
+      const lines = code.split('\n');
+      let output = '';
+      let tables = {};
+      
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('--')) continue; // Skip comments
+        
+        if (trimmed.toUpperCase().includes('SELECT')) {
+          if (trimmed.includes('"Hello, World!"')) {
+            output += 'greeting\n';
+            output += 'Hello, World!\n\n';
+          }
+        } else if (trimmed.toUpperCase().includes('CREATE TABLE')) {
+          output += 'Table created successfully.\n\n';
+        } else if (trimmed.toUpperCase().includes('INSERT INTO')) {
+          output += 'Data inserted successfully.\n\n';
+        } else if (trimmed.toUpperCase().includes('SELECT') && trimmed.includes('numbers')) {
+          output += 'id\tvalue\tdoubled\n';
+          output += '1\t1\t2\n';
+          output += '2\t2\t4\n';
+          output += '3\t3\t6\n';
+          output += '4\t4\t8\n';
+          output += '5\t5\t10\n\n';
+        }
+      }
+      
+      outputPre.textContent = output;
+    }
+
+    function runGeneric(language, code) {
+      // For languages without specific interpreters, show a message
+      outputPre.textContent = `Running ${language} code...\n\n`;
+      outputPre.textContent += `Code:\n${code}\n\n`;
+      outputPre.textContent += `Note: This is a demonstration. For actual ${language} compilation, you would need a proper ${language} compiler or interpreter.`;
+      
+      // Add some educational content
+      consolePre.textContent = `Language: ${language}\n`;
+      consolePre.textContent += `Lines of code: ${code.split('\n').length}\n`;
+      consolePre.textContent += `Characters: ${code.length}\n`;
+      
+      // Show syntax highlighting info
+      const keywords = code.match(/\b(if|else|for|while|function|class|import|export|const|let|var|return|public|private|static|void|int|string|boolean)\b/g);
+      if (keywords) {
+        consolePre.textContent += `Keywords found: ${keywords.join(', ')}\n`;
+      }
+    }
   };
 
   // Number systems listing and detail

@@ -9,18 +9,53 @@
 </head>
 <body>
     <header class="site-header">
-        <div class="container header-inner">
-            <div class="brand" onclick="location.hash='/'">CodeGalaxy</div>
-            <nav class="nav">
-                <a href="#/">Home</a>
-                <a href="#/languages">Languages</a>
-                <a href="#/compiler">Compiler</a>
-                <a href="#/number-systems">Number Systems</a>
-                <a href="#/converter">Number Converter</a>
-                <a href="#/coding-schemes">Coding Schemes</a>
-            </nav>
+        <div class="container">
+            <div class="header-inner">
+                <div class="brand" onclick="location.hash='/'">
+                    <div class="brand-icon">🚀</div>
+                    CodeGalaxy
+                </div>
+                <nav class="nav" id="main-nav">
+                    <a href="#/" class="nav-link">Home</a>
+                    <a href="#/languages" class="nav-link">Languages</a>
+                    <a href="#/compiler" class="nav-link">Compiler</a>
+                    <a href="#/number-systems" class="nav-link">Number Systems</a>
+                    <a href="#/converter" class="nav-link">Number Converter</a>
+                    <a href="#/coding-schemes" class="nav-link">Coding Schemes</a>
+                    <a href="#/challenges" class="nav-link">Challenges</a>
+                    <a href="#/progress" class="nav-link">Progress</a>
+                </nav>
+                <div class="header-controls">
+                    <button class="theme-toggle" id="theme-toggle" data-tooltip="Toggle Theme">
+                        🌙
+                    </button>
+                    <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+                        ☰
+                    </button>
+                </div>
+            </div>
         </div>
     </header>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+    
+    <!-- Modal Container -->
+    <div class="modal-backdrop" id="modal-backdrop">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Modal Title</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                Modal content goes here
+            </div>
+            <div class="modal-footer" id="modal-footer">
+                <button class="btn secondary" id="modal-cancel">Cancel</button>
+                <button class="btn" id="modal-confirm">Confirm</button>
+            </div>
+        </div>
+    </div>
 
     <main id="app" class="container page"></main>
 
@@ -33,7 +68,7 @@
 
     <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
     <script src="assets/data.js"></script>
-    <script src="assets/app.js"></script>
+    <script src="assets/enhanced-app.js"></script>
 </body>
 <!--
   This project is a single-page application using hash-based routing.
